@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>nite Authentication Service</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #ecf0f5; display: flex; justify_content: center; align_items: center; height: 100vh; margin: 0; }
+        .login-box { width: 360px; background: #fff; padding: 20px; box-shadow: 0 0 10px rgba(0,0,0,0.1); border-radius: 4px; }
+        .login-logo { text-align: center; margin-bottom: 20px; font-size: 35px; font-weight: 300; }
+        .login-logo b { font-weight: 700; }
+        .form-group { margin-bottom: 15px; }
+        input[type="text"], input[type="password"] { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+        button { width: 100%; padding: 10px; background-color: #3c8dbc; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; }
+        button:hover { background-color: #367fa9; }
+        .links { text-align: center; margin-top: 15px; font-size: 14px; }
+        .links a { color: #3c8dbc; text-decoration: none; }
+        .error { color: red; text-align: center; margin-bottom: 10px; }
+        .success { color: green; text-align: center; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <div class="login-box">
+        <div class="login-logo">
+            <a><b>nite</b> SSO</a>
+        </div>
+        
+        {% if error %}
+        <div class="error">{{ error }}</div>
+        {% endif %}
+        
+        {% if success %}
+        <div class="success">{{ success }}</div>
+        {% endif %}
+
+        <form action="/doLogin" method="POST">
+            <div class="form-group">
+                <input type="text" name="username" placeholder="Username" required>
+            </div>
+            <div class="form-group">
+                <input type="password" name="password" placeholder="Password" required>
+            </div>
+            <input type="hidden" name="redirect_url" value="{{ redirect_url }}">
+            <button type="submit">Sign In</button>
+        </form>
+
+        <div class="links">
+            <a href="/register">Register a new membership</a>
+        </div>
+    </div>
+</body>
+</html>

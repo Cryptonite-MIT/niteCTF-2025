@@ -1,0 +1,488 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Antakshari</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: #000000;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      z-index: 1;
+      display: block;
+    }
+
+    .content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 30px;
+    }
+
+    .title {
+      text-align: center;
+      font-size: 48px;
+      color: #ffffff;
+      font-weight: 300;
+      letter-spacing: 8px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+    }
+
+    .input-box {
+      background: rgba(255, 255, 255, 0.95);
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(100, 200, 150, 0.3);
+      max-width: 500px;
+      width: 100%;
+      backdrop-filter: blur(10px);
+    }
+
+    .input-label {
+      display: block;
+      color: #000000;
+      font-size: 12px;
+      font-weight: 400;
+      margin-bottom: 12px;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    #nodeSeq {
+      width: 100%;
+      padding: 14px;
+      border: 1px solid #cccccc;
+      border-radius: 2px;
+      font-size: 16px;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      background: #ffffff;
+      color: #000000;
+      transition: all 0.3s ease;
+      margin-bottom: 16px;
+    }
+
+    #nodeSeq:focus {
+      outline: none;
+      border-color: #64c896;
+      background: #ffffff;
+      box-shadow: 0 0 10px rgba(100, 200, 150, 0.3);
+    }
+
+    #nodeSeq::placeholder {
+      color: #999999;
+    }
+
+    .button-group {
+      display: flex;
+      gap: 12px;
+    }
+
+    button {
+      flex: 1;
+      padding: 12px 24px;
+      border: 1px solid #000000;
+      border-radius: 2px;
+      font-size: 12px;
+      font-weight: 400;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Helvetica Neue', Arial, sans-serif;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .btn-check {
+      background: #000000;
+      color: #ffffff;
+    }
+
+    .btn-check:hover {
+      background: #333333;
+      box-shadow: 0 0 15px rgba(100, 200, 150, 0.5);
+    }
+
+    .btn-check:active {
+      transform: scale(0.98);
+    }
+
+    .btn-clear {
+      background: #ffffff;
+      color: #000000;
+    }
+
+    .btn-clear:hover {
+      background: #f0f0f0;
+      border-color: #64c896;
+    }
+
+    .btn-clear:active {
+      transform: scale(0.98);
+    }
+
+    .result-container {
+      max-width: 500px;
+      width: 100%;
+      min-height: 80px;
+      margin-top: 10px;
+      display: none;
+    }
+
+    .result-container.show {
+      display: block;
+      animation: slideIn 0.4s ease-out;
+    }
+
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .result-box {
+      padding: 20px;
+      border-radius: 4px;
+      font-size: 14px;
+      line-height: 1.6;
+      text-align: center;
+      backdrop-filter: blur(10px);
+    }
+
+    .result-success {
+      background: rgba(76, 175, 80, 0.9);
+      color: #ffffff;
+      border: 2px solid #4CAF50;
+      box-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
+    }
+
+    .result-error {
+      background: rgba(244, 67, 54, 0.9);
+      color: #ffffff;
+      border: 2px solid #f44336;
+      box-shadow: 0 0 20px rgba(244, 67, 54, 0.4);
+    }
+
+    .flag-display {
+      background: #000000;
+      color: #64c896;
+      padding: 15px;
+      border-radius: 4px;
+      font-family: 'Courier New', monospace;
+      margin-top: 15px;
+      word-break: break-all;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(100, 200, 150, 0.5);
+      border: 1px solid #64c896;
+    }
+
+    .loading {
+      display: none;
+      color: #64c896;
+      font-weight: bold;
+      text-align: center;
+      animation: pulse 1s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .title {
+        font-size: 36px;
+      }
+
+      .input-box {
+        padding: 20px;
+      }
+
+      .button-group {
+        flex-direction: column;
+      }
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas"></canvas>
+  
+  <div class="content">
+    <div class="title">ANTAKSHARI</div>
+
+    <div class="input-box">
+      <label class="input-label" for="nodeSeq">Enter the Actor Node Sequence in Decending Order</label>
+      <input 
+        type="text" 
+        id="nodeSeq" 
+        placeholder="e.g., 12,8,5,3"
+        autocomplete="off"
+      />
+
+      <div class="button-group">
+        <button class="btn-check" onclick="verify()">Check</button>
+        <button class="btn-clear" onclick="clearInput()">Clear</button>
+      </div>
+
+      <div class="loading" id="loading">Verifying...</div>
+
+      <div class="result-container" id="resultContainer">
+        <div class="result-box" id="resultBox"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    const nodeSeqInput = document.getElementById('nodeSeq');
+    const resultContainer = document.getElementById('resultContainer');
+    const resultBox = document.getElementById('resultBox');
+    const loadingDiv = document.getElementById('loading');
+
+    // Set canvas size
+    function resizeCanvas() {
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', resizeCanvas);
+
+    // Mouse tracking
+    let mouseX = window.innerWidth / 2;
+    let mouseY = window.innerHeight / 2;
+
+    document.addEventListener('mousemove', (e) => {
+      mouseX = e.clientX;
+      mouseY = e.clientY;
+    });
+
+    // Network nodes
+    class Node {
+      constructor(x, y) {
+        this.x = x;
+        this.y = y;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = (Math.random() - 0.5) * 2;
+      }
+
+      update() {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        // Bounce off walls
+        if (this.x < 0 || this.x > canvas.width) this.vx *= -1;
+        if (this.y < 0 || this.y > canvas.height) this.vy *= -1;
+
+        this.x = Math.max(0, Math.min(canvas.width, this.x));
+        this.y = Math.max(0, Math.min(canvas.height, this.y));
+      }
+
+      draw() {
+        const dist = Math.hypot(this.x - mouseX, this.y - mouseY);
+        const color = dist < 150 ? '#64c896' : '#444444';
+        
+        ctx.fillStyle = color;
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      findNearestNodes(exclude = []) {
+        return nodes
+          .filter(n => n !== this && !exclude.includes(n))
+          .map(n => ({
+            node: n,
+            dist: Math.hypot(n.x - this.x, n.y - this.y)
+          }))
+          .sort((a, b) => a.dist - b.dist)
+          .slice(0, 3)
+          .map(item => item.node);
+      }
+    }
+
+    // Create network
+    const nodes = [];
+    const cutRadius = 40; // Reduced from 100
+    const cutConnections = new Set();
+    
+    for (let i = 0; i < 50; i++) {
+      nodes.push(new Node(Math.random() * canvas.width, Math.random() * canvas.height));
+    }
+
+    // Check if a line segment intersects with cursor radius
+    function isLineCutByCursor(x1, y1, x2, y2) {
+      // Find closest point on line segment to cursor
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+      const len2 = dx * dx + dy * dy;
+      
+      if (len2 === 0) {
+        return Math.hypot(mouseX - x1, mouseY - y1) < cutRadius;
+      }
+      
+      const t = Math.max(0, Math.min(1, ((mouseX - x1) * dx + (mouseY - y1) * dy) / len2));
+      const closestX = x1 + t * dx;
+      const closestY = y1 + t * dy;
+      
+      return Math.hypot(mouseX - closestX, mouseY - closestY) < cutRadius;
+    }
+
+    // Animation loop
+    function animate() {
+      ctx.fillStyle = '#000000';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Update and draw nodes
+      nodes.forEach(node => {
+        node.update();
+        node.draw();
+      });
+
+      // Clear old cut connections that are far from cursor
+      const toRemove = [];
+      cutConnections.forEach(key => {
+        const [i1, i2] = key.split('-').map(Number);
+        const n1 = nodes[i1];
+        const n2 = nodes[i2];
+        if (n1 && n2) {
+          if (!isLineCutByCursor(n1.x, n1.y, n2.x, n2.y)) {
+            toRemove.push(key);
+          }
+        }
+      });
+      toRemove.forEach(key => cutConnections.delete(key));
+
+      // Draw connections with cutting logic
+      nodes.forEach((node, i) => {
+        const nearestNodes = node.findNearestNodes();
+        
+        nearestNodes.forEach(other => {
+          const j = nodes.indexOf(other);
+          const dist = Math.hypot(node.x - other.x, node.y - other.y);
+          
+          if (dist < 150) {
+            const connectionKey = i < j ? `${i}-${j}` : `${j}-${i}`;
+            const isCut = isLineCutByCursor(node.x, node.y, other.x, other.y);
+            
+            if (isCut) {
+              cutConnections.add(connectionKey);
+            }
+            
+            // Don't draw if cut
+            if (!cutConnections.has(connectionKey)) {
+              const alpha = 1 - (dist / 150);
+              ctx.strokeStyle = `rgba(100, 200, 150, ${alpha * 0.3})`;
+              ctx.lineWidth = 1;
+              ctx.beginPath();
+              ctx.moveTo(node.x, node.y);
+              ctx.lineTo(other.x, other.y);
+              ctx.stroke();
+            }
+          }
+        });
+      });
+
+      requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Event listeners
+    nodeSeqInput.addEventListener('keypress', function(e) {
+      if (e.key === 'Enter') {
+        verify();
+      }
+    });
+
+    function clearInput() {
+      nodeSeqInput.value = '';
+      resultContainer.classList.remove('show');
+      nodeSeqInput.focus();
+    }
+
+    async function verify() {
+      const seq = nodeSeqInput.value.trim();
+      
+      if (!seq) {
+        showResult('Please enter a node sequence!', 'error');
+        return;
+      }
+
+      loadingDiv.style.display = 'block';
+      resultContainer.classList.remove('show');
+
+      try {
+        const res = await fetch('/api/verify', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({ node_sequence: seq }),
+        });
+
+        if (!res.ok) {
+          throw new Error(`HTTP error! status: ${res.status}`);
+        }
+
+        const data = await res.json();
+        const result = data.result;
+
+        if (result.includes('nite{')) {
+          showResult(result, 'success', true);
+        } else if (result.includes('Incorrect')) {
+          showResult('Incorrect! Try again.', 'error');
+        } else {
+          showResult(result, 'error');
+        }
+      } catch (error) {
+        showResult(`Error: ${error.message}`, 'error');
+      } finally {
+        loadingDiv.style.display = 'none';
+      }
+    }
+
+    function showResult(message, type = 'error', isFlag = false) {
+      resultBox.className = `result-box result-${type}`;
+      
+      if (isFlag) {
+        resultBox.innerHTML = `
+          <strong>CORRECT!</strong><br>
+          <div class="flag-display">${message}</div>
+        `;
+      } else {
+        resultBox.textContent = message;
+      }
+      
+      resultContainer.classList.add('show');
+    }
+  </script>
+</body>
+</html>

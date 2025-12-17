@@ -1,0 +1,19 @@
+Neural Flag Checker - Extracted Weights
+======================================================================
+
+Charset: abcdefghijklmnopqrstuvwxyz0123456789{}_
+Charset size (V): 39
+Flag length (L): 34
+Embedding dim: 32
+Hidden dim: 64
+
+Weight shapes:
+  W0      : (39, 32)
+  W1      : (34, 32)
+  W2      : (34, 64, 32)
+  W3      : (34, 64)
+  W4      : (34, 1, 64)
+  W5      : (34,)
+  G0      : (64, 32)
+  G1      : (64,)
+  G2      : (64,)

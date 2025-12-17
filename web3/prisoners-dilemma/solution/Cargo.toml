@@ -1,0 +1,11 @@
+[package]
+name = "solchal-solve"
+version = "1.0.0"
+edition = "2021"
+
+[dependencies]
+borsh = "0.10.3"
+solana-program = "1.18"
+
+[lib]
+crate-type = ["cdylib", "lib"]

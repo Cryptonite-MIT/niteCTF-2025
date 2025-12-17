@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Notes</title>
+</head>
+<body>
+    <h1>Notes - {{ username }}</h1>
+    <p><a href="/logout">Logout</a></p>
+    <h2>Create Note</h2>
+    <form method="POST">
+        <textarea name="content" rows="5" cols="50" required></textarea><br>
+        <button type="submit">Create Note</button>
+    </form>
+    <h2>Your Notes</h2>
+    {% for note in notes %}
+    <div>
+        <p><a href="/notes/{{ note.id }}">View Note #{{ note.id }}</a></p>
+        <p>Created: {{ note.created_at }}</p>
+    </div>
+    {% endfor %}
+</body>
+</html>
+

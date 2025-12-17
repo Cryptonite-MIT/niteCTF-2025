@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Employee Directory Search</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Existing autofill styling unchanged */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px #111 inset !important;
+      -webkit-text-fill-color: #00eaff !important;
+      font-family: ui-monospace, monospace !important;
+      transition: background-color 5000s ease-in-out 0s;
+      caret-color: #00eaff !important;
+    }
+    input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #faff00 !important;
+      caret-color: #faff00 !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0a0a0f] text-[#00eaff] p-8 font-mono">
+  <div class="flex justify-between items-center mb-6">
+    <h1 class="text-3xl font-extrabold text-[#faff00] tracking-widest drop-shadow-[0_0_8px_#00eaff]">
+      EMPLOYEE DIRECTORY
+    </h1>
+    <a href="/logout" class="px-4 py-2 rounded bg-[#ff003c] text-white font-bold hover:bg-[#ff4d6d] transition">
+      LOGOUT
+    </a>
+  </div>
+
+  <div class="flex gap-6 mb-6">
+    <!-- Search Name Form -->
+    <form id="search-form" method="post" action="/search"
+          class="flex-1 bg-black/80 border border-[#00eaff] rounded-2xl p-6 shadow-[0_0_15px_#00eaff]">
+      <div class="mb-4">
+        <label class="block text-[#faff00] mb-2 font-bold">Search Name</label>
+        <input type="text" name="term" placeholder="name"
+               class="w-full p-3 rounded bg-[#111] border border-[#00eaff] text-[#00eaff] placeholder-gray-500 focus:outline-none focus:border-[#faff00] focus:ring-2 focus:ring-[#faff00] shadow-[0_0_6px_#00eaff]">
+      </div>
+      <button type="submit"
+              class="w-full py-3 rounded bg-[#faff00] text-black font-bold tracking-wider hover:bg-[#00eaff] hover:text-black transition shadow-[0_0_12px_#faff00]">
+        SEARCH
+      </button>
+    </form>
+
+    <!-- Admin Passcode Form -->
+    <form id="passcode-form" method="post" action="/admin-login"
+          class="w-1/3 bg-black/80 border border-[#00eaff] rounded-2xl p-6 shadow-[0_0_15px_#00eaff]">
+      <div class="mb-4">
+        <label class="block text-[#faff00] mb-2 font-bold">Admin Passcode</label>
+        <input type="password" name="passcode" placeholder="Enter passcode"
+               class="w-full p-3 rounded bg-[#111] border border-[#00eaff] text-[#00eaff] placeholder-gray-500 focus:outline-none focus:border-[#faff00] focus:ring-2 focus:ring-[#faff00] shadow-[0_0_6px_#00eaff]">
+      </div>
+      <button type="submit"
+              class="w-full py-3 rounded bg-[#00eaff] text-black font-bold tracking-wider hover:bg-[#faff00] hover:text-black transition shadow-[0_0_12px_#00eaff]">
+        LOGIN
+      </button>
+    </form>
+  </div>
+
+  {% if message %}
+    <p class="text-[#ff4d6d] font-bold text-center mb-4 drop-shadow-[0_0_6px_#ff003c]">{{ message }}</p>
+  {% endif %}
+
+  {% if results %}
+    <div class="overflow-x-auto">
+      <table class="w-full border-collapse bg-black/80 shadow-[0_0_12px_#00eaff]">
+        <thead>
+          <tr class="bg-[#111] border-b border-[#00eaff]">
+            <th class="p-3 text-left">ID</th>
+            <th class="p-3 text-left">Name</th>
+            <th class="p-3 text-left">Department</th>
+            <th class="p-3 text-left">Email</th>
+            <th class="p-3 text-left">Notes</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in results %}
+            <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+              <td class="p-3">{{ row[0] }}</td>
+              <td class="p-3">{{ row[1] }}</td>
+              <td class="p-3">{{ row[2] }}</td>
+              <td class="p-3">{{ row[3] }}</td>
+              <td class="p-3">{{ row[4] }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  {% else %}
+    <p class="text-center text-gray-400">No results.</p>
+  {% endif %}
+
+  <script>
+    document.getElementById('search-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = this;
+      const formData = new FormData(form);
+      
+      const res = await fetch(form.action, {
+        method: 'POST',
+        body: formData
+      });
+      
+      if (res.ok) {
+        const html = await res.text();
+        document.open();
+        document.write(html);
+        document.close();
+      } else if (res.status === 401) {
+        alert('Session expired. Redirecting to login.');
+        window.location.href = '/';
+      } else {
+        alert('Search failed.');
+      }
+    });
+
+    document.getElementById('passcode-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const form = this;
+      const formData = new FormData(form);
+
+      const existingError = form.querySelector('.error-message');
+      if (existingError) {
+        existingError.remove();
+      }
+
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: {
+            'Accept': 'application/json'
+          },
+          body: formData
+        });
+
+        if (res.ok) {
+          const json = await res.json();
+          
+          if (json.success && json.redirect) {
+            window.location.href = json.redirect;
+          } else {
+            showError(form, 'Login failed');
+          }
+        } else {
+          const errorText = await res.text();
+          console.log('Passcode error:', errorText);
+          showError(form, 'Invalid passcode');
+        }
+      } catch (error) {
+        console.error('Passcode submission error:', error);
+        showError(form, 'Passcode submission failed');
+      }
+    });
+
+    function showError(form, message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message mt-2 p-2 rounded bg-[#220000] border border-[#ff003c] text-[#ff4d6d] font-bold text-center shadow-[0_0_10px_#ff003c] text-sm';
+      errorDiv.textContent = message;
+      
+      form.appendChild(errorDiv);
+      
+      setTimeout(() => {
+        if (errorDiv.parentNode) {
+          errorDiv.remove();
+        }
+      }, 4000);
+    }
+  </script>
+</body>
+</html>

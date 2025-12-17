@@ -1,0 +1,16 @@
+{
+  "name": "web",
+  "version": "1.0.0",
+  "description": "Consolidated Vault Service + Bot Interface",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "ejs": "^3.1.9",
+    "cookie-parser": "^1.4.6",
+    "axios": "^1.6.0",
+    "uuid": "^9.0.0"
+  }
+}

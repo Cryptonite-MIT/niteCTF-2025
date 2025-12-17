@@ -1,0 +1,142 @@
+  <!DOCTYPE html>
+  <html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Citadel Corp Portal - Login</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      :root {
+        --neon-blue: #00eaff;
+        --neon-yellow: #faff00;
+        --input-bg: #111;
+      }
+      html { color-scheme: dark; }
+      input, button { font-family: inherit; }
+
+      /* Autofill styling from your original snippet retained */
+      input:-webkit-autofill,
+      input:-webkit-autofill:hover,
+      input:-webkit-autofill:active {
+        -webkit-box-shadow:
+          0 0 0 1000px var(--input-bg) inset,
+          0 0 6px var(--neon-blue) !important;
+        -webkit-text-fill-color: var(--neon-blue) !important;
+        caret-color: var(--neon-blue) !important;
+        border: 1px solid var(--neon-blue) !important;
+        border-radius: 0.5rem !important;
+        font-family: inherit !important;
+        font-size: inherit !important;
+        line-height: inherit !important;
+        transition: background-color 99999s ease-in-out 0s, color 99999s ease-in-out 0s;
+        background-clip: padding-box !important;
+      }
+      input:-webkit-autofill:focus {
+        -webkit-text-fill-color: var(--neon-yellow) !important;
+        caret-color: var(--neon-yellow) !important;
+        border-color: var(--neon-yellow) !important;
+        -webkit-box-shadow:
+          0 0 0 1000px var(--input-bg) inset,
+          0 0 6px var(--neon-blue),
+          0 0 0 3px var(--neon-yellow) !important;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen bg-[#0a0a0f] flex items-center justify-center font-mono">
+    <div class="bg-black/80 border border-[#00eaff] rounded-2xl shadow-[0_0_25px_#00eaff] w-full max-w-md p-8">
+      <h1 class="text-3xl font-extrabold text-center mb-6 text-[#faff00] tracking-widest drop-shadow-[0_0_8px_#00eaff]">
+        CITADEL CORP
+      </h1>
+      <h2 class="text-center text-lg mb-8 text-[#00eaff] drop-shadow-[0_0_6px_#faff00]">
+        ACCESS PORTAL
+      </h2>
+
+      {% if error %}
+      <div class="mb-4 p-2 rounded bg-[#220000] border border-[#ff003c] text-[#ff4d6d] font-bold text-center shadow-[0_0_10px_#ff003c]">
+        {{ error }}
+      </div>
+      {% endif %}
+
+      <!-- Main login form -->
+      <form id="login-form" method="post" action="/" class="space-y-6">
+        <div>
+          <label class="block text-[#faff00] mb-1 font-bold">Username</label>
+          <input name="username" placeholder="Enter your username"
+            class="w-full p-3 rounded bg-[#111] border border-[#00eaff] text-[#00eaff] placeholder-gray-500 focus:outline-none focus:border-[#faff00] focus:ring-2 focus:ring-[#faff00] transition duration-200" />
+        </div>
+        <div>
+          <label class="block text-[#faff00] mb-1 font-bold">Password</label>
+          <input type="password" name="password" placeholder="Enter your password"
+            class="w-full p-3 rounded bg-[#111] border border-[#00eaff] text-[#00eaff] placeholder-gray-500 focus:outline-none focus:border-[#faff00] focus:ring-2 focus:ring-[#faff00] transition duration-200"/>
+        </div>
+        <button type="submit"
+          class="w-full py-3 rounded bg-[#faff00] text-black font-bold tracking-wider hover:bg-[#00eaff] hover:text-black transition shadow-[0_0_12px_#00eaff]"
+          id="login-button">
+          LOGIN
+        </button>
+      </form>
+    </div>
+
+  <script>
+  document.addEventListener("DOMContentLoaded", () => {
+    const form = document.getElementById("login-form");
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      
+      console.log("Login form submitted"); // Debug
+      
+      // Clear any existing error
+      const existingError = document.querySelector('.error-message');
+      if (existingError) {
+        existingError.remove();
+      }
+      
+      const formData = new FormData(form);
+      
+      try {
+        const res = await fetch(form.action, {
+          method: "POST",
+          body: formData,
+          headers: { "Accept": "application/json" }
+        });
+
+        
+        const responseText = await res.text();
+
+        let json;
+        try {
+          json = JSON.parse(responseText);
+        } catch (parseError) {
+          console.error("Failed to parse JSON:", parseError);
+          showError("Login failed - invalid response");
+          return;
+        }
+        
+        if (res.ok && (json.success || json.access_token)) {
+          window.location.href = json.redirect || "/search";
+        } else {
+          showError(json.msg || "Login failed");
+        }
+      } catch (error) {
+        showError("Login failed - network error");
+      }
+    });
+    
+    function showError(message) {
+      const errorDiv = document.createElement('div');
+      errorDiv.className = 'error-message mb-4 p-2 rounded bg-[#220000] border border-[#ff003c] text-[#ff4d6d] font-bold text-center shadow-[0_0_10px_#ff003c]';
+      errorDiv.textContent = message;
+      
+      const form = document.getElementById('login-form');
+      form.parentNode.insertBefore(errorDiv, form);
+      
+      setTimeout(() => {
+        if (errorDiv.parentNode) {
+          errorDiv.remove();
+        }
+      }, 5000);
+    }
+  });
+  </script>
+
+  </body>
+  </html>

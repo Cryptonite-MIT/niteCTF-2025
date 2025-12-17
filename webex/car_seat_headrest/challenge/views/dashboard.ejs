@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nite Vault - Dashboard</title>
+</head>
+
+<body>
+    <div>
+        <div>
+            <nav>
+                <div>
+                    <span>Nite Vault</span>
+                </div>
+                <a href="/logout">Logout</a>
+            </nav>
+
+            <div>
+                <h1>Welcome, <%= user.username %>!</h1>
+                <p>Secure access granted</p>
+
+                <div>
+                    <h2>Account Information</h2>
+                    <div>
+                        <div>
+                            <label>Username:</label>
+                            <span>
+                                <%= user.username %>
+                            </span>
+                        </div>
+                        <div>
+                            <label>Email:</label>
+                            <span>
+                                <%= user.email %>
+                            </span>
+                        </div>
+                        <div>
+                            <label>Role:</label>
+                            <span>
+                                <%= user.role %>
+                            </span>
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h2>Vulnerabilities Leaderboard</h2>
+                    <table border="1" cellpadding="10">
+                        <tr>
+                            <th>Rank</th>
+                            <th>Researcher</th>
+                            <th>Vulnerability Type</th>
+                            <th>Severity</th>
+                            <th>Submitted</th>
+                        </tr>
+                        <tr>
+                            <td>1</td>
+                            <td>alice_sec</td>
+                            <td>XSS in Profile Page</td>
+                            <td>High</td>
+                            <td>2025-12-01</td>
+                        </tr>
+                        <tr>
+                            <td>2</td>
+                            <td>bob_hacker</td>
+                            <td>SQL Injection in Search</td>
+                            <td>Critical</td>
+                            <td>2025-12-03</td>
+                        </tr>
+                        <tr>
+                            <td>3</td>
+                            <td>charlie_researcher</td>
+                            <td>CSRF in Settings</td>
+                            <td>Medium</td>
+                            <td>2025-12-05</td>
+                        </tr>
+                        <tr>
+                            <td>4</td>
+                            <td>dave_pentester</td>
+                            <td>Open Redirect</td>
+                            <td>Low</td>
+                            <td>2025-12-07</td>
+                        </tr>
+                        <tr>
+                            <td>5</td>
+                            <td>eve_whitehat</td>
+                            <td>Information Disclosure</td>
+                            <td>Medium</td>
+                            <td>2025-12-08</td>
+                        </tr>
+                    </table>
+
+                </div>
+
+                <% if (user.flag) { %>
+                    <div>
+                        <h2>Security Flag</h2>
+                        <p><strong>
+                                <%= user.flag %>
+                            </strong></p>
+                    </div>
+                    <% } %>
+
+                        <div>
+                            <h2>Security</h2>
+                            <p>Found a vulnerability in our system?</p>
+                            <p><strong>Submit vulnerable website here:</strong> <a
+                                    href="/submit">
+                                    /submit
+                                </a></p>
+                        </div>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

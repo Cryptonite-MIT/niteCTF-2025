@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audit Result</title>
+</head>
+
+<body>
+    <div>
+        <div>
+            <h1>Review Result</h1>
+
+            <% if (review.status==='running' ) { %>
+                <div>
+                    <div></div>
+                    <p>Security analyst reviewing URL...</p>
+                </div>
+                <script>
+                    setTimeout(() => location.reload(), 3000);
+                </script>
+
+                <% } else if (review.status==='error' ) { %>
+                    <div>
+                        <h2>Error</h2>
+                        <p>
+                            <%= review.error %>
+                        </p>
+                    </div>
+
+                    <% } else if (review.status==='completed' ) { %>
+                        <% if (review.success && review.vulnerable) { %>
+                            <div>
+                                <h2>Complete</h2>
+                                <p>Review finished successfully.</p>
+                                <p><strong>Vulnerability detected in submitted content.</strong></p>
+                            </div>
+
+                            <% } else { %>
+                                <div>
+                                    <h2>Failed</h2>
+                                    <p>Review could not be completed.</p>
+                                </div>
+                                <% } %>
+
+                                    <div>
+                                        <div>
+                                            <span>Submitted URL:</span>
+                                            <span>
+                                                <%= review.url %>
+                                            </span>
+                                        </div>
+                                        <div>
+                                            <span>Timestamp:</span>
+                                            <span>
+                                                <%= review.completedTime %>
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <% } %>
+
+                                        <a href="/">← Submit Another</a>
+        </div>
+    </div>
+</body>
+
+</html>

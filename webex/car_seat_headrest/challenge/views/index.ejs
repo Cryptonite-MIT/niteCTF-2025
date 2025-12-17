@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Security Audit Portal</title>
+</head>
+
+<body>
+    <div>
+        <div>
+            <div>
+                <h1>Security Audit</h1>
+                <p>Submit suspicious URLs for automated security review</p>
+            </div>
+
+            <div>
+                <div>
+                    <form id="urlForm">
+                        <div>
+                            <label for="url">Suspicious URL:</label>
+                            <input type="url" id="url" name="url" placeholder="https://example.com/page" required>
+                        </div>
+                        <button type="submit">Submit for Review</button>
+                    </form>
+                </div>
+
+                <div id="loading" style="display: none;">
+                    <div></div>
+                    <p>Security analyst reviewing URL...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.getElementById('urlForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const url = document.getElementById('url').value;
+            const form = e.target;
+            const loading = document.getElementById('loading');
+
+            form.style.display = 'none';
+            loading.style.display = 'flex';
+
+            try {
+                const response = await fetch('/submit', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                const result = await response.json();
+
+                window.location.href = '/result/' + result.id;
+            } catch (error) {
+                alert('Error: ' + error.message);
+                form.style.display = 'block';
+                loading.style.display = 'none';
+            }
+        });
+    </script>
+</body>
+
+</html>

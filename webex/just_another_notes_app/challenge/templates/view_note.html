@@ -1,0 +1,14 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Note</title>
+</head>
+<body>
+    <h1>Note #{{ note.id }}</h1>
+    <p><a href="/notes">Back to Notes</a></p>
+    <div>
+        {{ note.content|safe }}
+    </div>
+</body>
+</html>
+

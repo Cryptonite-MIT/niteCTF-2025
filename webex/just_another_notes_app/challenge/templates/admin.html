@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Panel</title>
+</head>
+<body>
+    <h1>Admin Panel</h1>
+    <h2>Generate Invite</h2>
+    <button onclick="generateInvite()">Generate Invite for Moderator</button>
+    <p><a href="/notes">Back to Notes</a></p>
+    <script>
+        async function generateInvite() {
+            const response = await fetch('/admin/generate_invite', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({target_user: 'moderator'})
+            });
+            const data = await response.json();
+            if (data.success) {
+                document.getElementById('result').innerHTML = 'Invite generated! Share URL: ' + data.url;
+            } else {
+                document.getElementById('result').innerHTML = 'Error: ' + data.error;
+            }
+        }
+    </script>
+</body>
+</html>
+

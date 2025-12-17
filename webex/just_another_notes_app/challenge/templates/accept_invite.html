@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Accept Invite</title>
+</head>
+<body>
+    <h1>Accept Invite</h1>
+    {% if error %}
+    <p style="color: red;">{{ error }}</p>
+    {% endif %}
+    <form method="POST">
+        <label>Invite Token: <input type="text" name="token" value="{{ token or '' }}" required></label><br>
+        <button type="submit">Accept Invite</button>
+    </form>
+    <p><a href="/notes">Back to Notes</a></p>
+</body>
+</html>
+

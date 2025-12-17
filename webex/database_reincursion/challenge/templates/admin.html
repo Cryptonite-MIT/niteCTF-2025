@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Citadel Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Autofill and dropdown styling (unchanged) */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px #111 inset !important;
+      -webkit-text-fill-color: #00eaff !important;
+      font-family: monospace !important;
+      caret-color: #faff00;
+    }
+    datalist option, select, option {
+      background-color: #111;
+      color: #00eaff;
+      font-family: monospace;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-[#0a0a0f] text-[#00eaff] p-8 font-mono">
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-4xl font-extrabold text-[#faff00] tracking-widest drop-shadow-[0_0_8px_#00eaff]">
+      CITADEL ADMIN PANEL
+    </h1>
+    <!-- <div class="flex gap-4 items-center">
+      <a href="/logout" class="px-4 py-2 rounded bg-[#ff003c] text-white font-bold hover:bg-[#ff4d6d] transition">
+        LOGOUT
+      </a>
+    </div>
+  </div> -->
+
+  <!-- SysSec Status Panel -->
+  <div class="ml-6 bg-[#1a0000]/80 border border-[#ff003c] rounded-lg px-4 py-3 shadow-[0_0_8px_#ff003c] text-sm leading-snug">
+    <div class="font-bold text-[#ff003c] mb-1">[SYSSEC STATUS]</div>
+    <ul class="text-gray-300 space-y-0.5">
+      <li>Firewall Integrity: <span class="text-[#ff003c]">0%</span></li>
+      <li>Filter Engine: <span class="text-[#ff003c]">COMPROMISED – 12% ACTIVE</span></li>
+      <li>Audit Logging: <span class="text-[#ff003c]">DISABLED</span></li>
+      <li>Threat Response: <span class="text-[#ff003c]">UNAVAILABLE</span></li>
+    </ul>
+  </div>
+</div>
+
+  <form id="report-form" method="post" action="/admin"
+        class="bg-black/80 border border-[#00eaff] rounded-2xl p-6 mb-8 shadow-[0_0_15px_#00eaff]">
+    <label class="block text-[#faff00] mb-2 font-bold">Run Report Query</label>
+    <div class="flex space-x-2">
+      <input type="text" name="query" placeholder="e.g., Q1"
+             class="flex-1 p-3 rounded bg-[#111] border border-[#00eaff] text-[#00eaff] placeholder-gray-500 focus:outline-none focus:border-[#faff00] focus:ring-2 focus:ring-[#faff00] shadow-[0_0_6px_#00eaff]">
+      <button type="submit"
+              class="px-6 py-3 rounded bg-[#faff00] text-black font-bold tracking-wide hover:bg-[#00eaff] hover:text-black transition shadow-[0_0_10px_#faff00]">
+        RUN
+      </button>
+    </div>
+  </form>
+
+  {% if message %}
+    <div class="mb-6 p-3 rounded bg-[#220000] border border-[#ff003c] text-[#ff4d6d] text-center font-bold shadow-[0_0_12px_#ff003c]">
+      {{ message }}
+    </div>
+  {% endif %}
+
+  <h2 class="text-2xl font-bold mb-4 text-[#faff00] drop-shadow-[0_0_6px_#00eaff]">Reports</h2>
+  <div class="overflow-x-auto mb-10">
+    <table class="w-full border-collapse bg-black/80 shadow-[0_0_12px_#00eaff]">
+      <thead>
+        <tr class="bg-[#111] border-b border-[#00eaff]">
+          <th class="p-3 text-left">ID</th>
+          <th class="p-3 text-left">Quarter</th>
+          <th class="p-3 text-left">Note</th>
+          <th class="p-3 text-left">Revenue</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for row in results %}
+        <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+          <td class="p-3">{{ row[0] }}</td>
+          <td class="p-3">{{ row[1] }}</td>
+          <td class="p-3">{{ row[2] }}</td>
+          <td class="p-3">{{ row[3] }}</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+  <h2 class="text-2xl font-bold mb-4 text-[#faff00] drop-shadow-[0_0_6px_#00eaff]">Metadata Registry</h2>
+  <p class="mb-4 text-gray-400">This registry lists known tables in the system.</p>
+  <div class="overflow-x-auto">
+    <table class="w-full border-collapse bg-black/80 shadow-[0_0_12px_#00eaff]">
+      <thead>
+        <tr class="bg-[#111] border-b border-[#00eaff]">
+          <th class="p-3 text-left">Table Name</th>
+          <th class="p-3 text-left">Description</th>
+          <th class="p-3 text-left">Last Update</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+          <td class="p-3">reports</td>
+          <td class="p-3">Quarterly revenue data for executives</td>
+          <td class="p-3">2077-02-14</td>
+        </tr>
+        <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+          <td class="p-3">users</td>
+          <td class="p-3">Stores user information</td>
+          <td class="p-3">2077-06-09</td>
+        </tr>
+        <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+          <td class="p-3">employees</td>
+          <td class="p-3">Directory of employees and their notes</td>
+          <td class="p-3">2077-09-23</td>
+        </tr>
+        <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+          <td class="p-3">metadata</td>
+          <td class="p-3">Lists tables in this system</td>
+          <td class="p-3">2077-12-05</td>
+        </tr>
+        <tr class="border-b border-[#222] hover:bg-[#1a1a2e] transition hover:shadow-[0_0_8px_#faff00]">
+          <td class="p-3">REDACTED</td>
+          <td class="p-3">REDACTED</td>
+          <td class="p-3">REDACTED</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>

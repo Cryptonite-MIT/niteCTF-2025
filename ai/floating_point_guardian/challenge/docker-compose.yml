@@ -1,0 +1,6 @@
+services:
+  guardian:
+    build: .
+    ports:
+      - "1337:1337"
+    restart: unless-stopped

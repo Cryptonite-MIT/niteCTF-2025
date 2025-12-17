@@ -1,0 +1,725 @@
+function main 0
+
+    call print_enter_flag 0
+
+    push constant 20    // flag base
+    push constant 48    // flag size
+    call get_input 2
+
+    push constant 20    // flag base
+    push constant 13337 // K1   0x3419
+    push constant 17771 // K2   0x456b
+    push constant 21881 // IV1  0x5579
+    push constant 28883 // IV2  0x70d3
+    push constant 68 // encrypted flag offset   0x3c
+    call encrypt_flag 6
+
+    //push constant 68
+    //push constant 48
+    //print xb
+
+    push constant 116
+    call save_encrypted_flag_bytes 1
+
+    push constant 68
+    push constant 116
+    call compare_bytes 2
+
+    exit
+    //label HALT
+    //    goto HALT
+
+// argument 0 = value and argument 1 = key
+function F1 0
+    // return (rol(value, 5) + key) ^ (lsr(value, 3) * key)
+    push argument 0     // feedback
+    push constant 5
+    call rotateLeft 2
+    push argument 1
+    add
+    push argument 0
+    push constant 3
+    call logicalShiftRight 2
+    push argument 1
+    mul
+    xor
+    return
+
+// argument 0 = value and argument 1 = key
+function F2 1 // 1 local var for quotient
+    // return (ror(value, 7) - key) ^ (value / (key | 1))
+    push argument 0
+    push constant 7
+    call rotateRight 2
+    push argument 1
+    sub
+    push argument 0
+    push argument 1
+    push constant 1
+    or
+    div
+    drop        // remainder
+    pop local 0 // quotient
+    push local 0
+    xor
+    return
+
+// local 0 feedback
+// local 1 encrypted flag offset
+// local 2 i
+// local 3 keystream
+// local 4 current flag offset
+// local 5 current ciphertext
+function encrypt_flag 8
+    push argument 3  // IV1
+    pop local 0     // feedback
+    push argument 5
+    pop local 1     // encrpted flag offset
+    push constant 0
+    pop local 2     // i
+
+    label P1_LOOP
+        push local 2
+        push constant 12
+        lt
+        if-goto P1_BODY
+        goto P1_END
+
+    label P1_BODY
+        push local 0    //  feedback = IV1
+        push argument 1 // K1
+        call F1 2   // F1(feedback, K1)
+
+        pop local 3     // keystream
+
+        //push local 3
+        //push constant 0
+        //poke w
+        //push constant 0
+        //push constant 1
+        //print iw
+        //push constant 10
+        //push constant 0
+        //poke b
+        //push constant 0
+        //push constant 1
+        //print c
+
+        push local 2
+        push constant 2     // i*2
+        mul
+        push argument 0
+        add     // base_offset + i*2
+        pop local 4     // current_offset
+
+        push local 4
+        peek w   // read plaintext word  peek is word addressable and peek.b is byte addressable
+
+        push local 3    //ciphertext = plaintext ^ keystream
+        xor
+        pop local 5 
+
+        push local 2
+        push constant 2     // i*2
+        mul
+        push argument 5     // encrypted flag base offset + i*2
+        add
+        pop local 1         // current encrypted flag offset
+
+        push local 5
+        push local 1
+        poke w  // write ciphertext word back to memory
+
+        push local 5
+        pop local 0     // feedback = ciphertext
+
+        push local 2
+        push constant 1
+        add
+        pop local 2
+        goto P1_LOOP
+
+    label P1_END
+        push argument 4     // IV2
+        pop local 0
+        push constant 0
+        pop local 2     // i
+
+        //push constant 60
+        //push constant 24
+        //print
+
+    label P2_LOOP
+        push local 2
+        push constant 12
+        lt
+        if-goto P2_BODY
+        goto P2_END
+
+    label P2_BODY
+        push local 0    //  feedback = IV1
+        push argument 2 // K1
+        call F2 2   // F2(feedback, K1)
+
+        pop local 3     // keystream
+
+        //push local 3
+        //push constant 0
+        //poke w
+        //push constant 0
+        //push constant 1
+        //print iw
+        //push constant 10
+        //push constant 0
+        //poke b
+        //push constant 0
+        //push constant 1
+        //print c
+
+        push local 3
+        pop local 0     // feedback = keystrean 
+
+        push local 2
+        push constant 2     // i*2
+        mul
+        push argument 0
+        add     // base_offset + i*2
+        push constant 24
+        add     // base_offset + i*2 + 24
+        pop local 4     // current_offset
+
+        push local 4
+        peek w    // read plaintext word  peek is word addressable and peek.b is byte addressable
+
+        push local 3    //ciphertext = plaintext ^ keystream
+        xor
+        pop local 5 
+
+        push local 5
+        push local 2    
+        push constant 2     // i*2
+        mul
+        push argument 5     // encrypted flag address base + i*2
+        add
+        push constant 24
+        add
+        pop local 1         // current encrypted flag offset
+
+        push local 1
+        poke w  // write ciphertext word back to memory
+
+
+        push local 2
+        push constant 1
+        add
+        pop local 2
+        goto P2_LOOP
+
+    label P2_END
+        push constant 0
+        pop local 2     // i
+
+        //push constant 60
+        //push constant 48
+        //print
+        //return
+
+    label SWAP_LOOP
+        push local 2
+        push constant 12
+        lt
+        if-goto SWAP_BODY
+        goto SWAP_END
+
+    label SWAP_BODY
+        push local 2
+        push constant 2
+        mul     // i*2
+        push argument 5
+        add
+        pop local 0     // offset 1
+
+        push local 2
+        push constant 2
+        mul
+        push argument 5
+        add
+        push constant 24
+        add
+        pop local 1     // offset 2
+
+        push local 0
+        peek w
+        pop local 6     // word1 at offset 1
+
+        push local 1
+        peek w
+        pop local 7     // word2 at offset 2
+
+        push local 7   
+        push local 0
+        poke w       // write word2 at offset 1
+
+        push local 6    
+        push local 1
+        poke w       // write word1 at offset 2
+
+        push local 2
+        push constant 1
+        add
+        pop local 2
+        goto SWAP_LOOP
+
+    label SWAP_END
+        return
+        
+
+function logicalShiftRight 2 // 2 local vars: temp_num, i
+    push argument 0
+    pop local 0     // temp_num = number
+    push argument 1
+    pop local 1     // i = n
+
+    label LSR_LOOP
+        push local 1    // if i == 0, goto end
+        if-goto LSR_BODY
+        goto LSR_END
+    
+    label LSR_BODY
+        // i = i - 1
+        push local 1
+        push constant 1
+        sub
+        pop local 1
+    
+        // temp_num = temp_num / 2
+        push local 0
+        push constant 2
+        div
+        drop
+        pop local 0
+    
+        goto LSR_LOOP
+
+    label LSR_END
+        push local 0
+        return
+
+//argument 0 value
+//argument 1 rot_val
+function rotateLeft 2 // 2 local vars: temp_num, i
+    push argument 0
+    pop local 0     // temp_num = number
+    push argument 1
+    pop local 1     // i = n
+
+    label ROL_LOOP
+        push local 1    // if i == 0, goto end
+        if-goto ROL_BODY
+        goto ROL_END
+    
+    label ROL_BODY
+        // i = i - 1
+        push local 1
+        push constant 1
+        sub
+        pop local 1
+    
+        // Check MSB of temp_num
+        push local 0
+        push constant 32768
+        lt              // if temp_num < 32768, MSB is 0
+        if-goto ROL_MSB_ZERO
+    
+    label ROL_MSB_ONE
+        // MSB is 1: shift left and add 1 (carry)
+        push local 0
+        push local 0
+        add
+        push constant 1
+        add
+        pop local 0
+        goto ROL_LOOP
+    
+    label ROL_MSB_ZERO
+        // MSB is 0: just shift left
+        push local 0
+        push local 0
+        add
+        pop local 0
+        goto ROL_LOOP
+    
+    label ROL_END
+        push local 0
+        return
+
+
+function rotateRight 3 // 3 local vars: temp_num, i, lsb
+    push argument 0
+    pop local 0     // temp_num = number
+    push argument 1
+    pop local 1     // i = n
+
+    label ROR_LOOP
+        push local 1    // if i == 0, goto end
+        if-goto ROR_BODY
+        goto ROR_END
+    
+    label ROR_BODY
+        // i = i - 1
+        push local 1
+        push constant 1
+        sub
+        pop local 1
+    
+        // Check LSB of temp_num
+        push local 0
+        push constant 1
+        and
+        pop local 2     // lsb = temp_num & 1
+    
+        // temp_num = temp_num / 2
+        push local 0
+        push constant 2
+        div
+        drop        // remainder
+        pop local 0
+    
+        // if lsb == 0, skip adding the carry
+        push local 2
+        if-goto ROR_LSB_ONE
+        goto ROR_LOOP
+    
+    label ROR_LSB_ONE
+        // LSB was 1: add 32768 to set the new MSB
+        push local 0
+        push constant 32768
+        add
+        pop local 0
+        goto ROR_LOOP
+    
+    label ROR_END
+        push local 0
+        return
+
+function get_input 2
+    
+    push argument 0
+    push argument 1
+    read
+
+    get-message
+    drop
+    push argument 1
+    eq
+    if-goto OK
+    exit
+    label OK
+        return
+    
+function print_enter_flag 0
+    push constant 69
+    push constant 0
+    poke b
+    push constant 110
+    push constant 1
+    poke b
+    push constant 116
+    push constant 2
+    poke b
+    push constant 101
+    push constant 3
+    poke b
+    push constant 114
+    push constant 4
+    poke b
+    push constant 32
+    push constant 5
+    poke b
+    push constant 97
+    push constant 6
+    poke b
+    push constant 99
+    push constant 7
+    poke b
+    push constant 99
+    push constant 8
+    poke b
+    push constant 101
+    push constant 9
+    poke b
+    push constant 115
+    push constant 10
+    poke b
+    push constant 115
+    push constant 11
+    poke b
+    push constant 32
+    push constant 12
+    poke b
+    push constant 99
+    push constant 13
+    poke b
+    push constant 111
+    push constant 14
+    poke b
+    push constant 100
+    push constant 15
+    poke b
+    push constant 101
+    push constant 16
+    poke b
+    push constant 58
+    push constant 17
+    poke b
+    push constant 32
+    push constant 18
+    poke b
+
+    push constant 0
+    push constant 19
+    print c
+
+    return
+
+function save_encrypted_flag_bytes 0
+    push constant 40
+    push constant 116
+    poke b
+    push constant 88
+    push constant 117
+    poke b
+    push constant 62
+    push constant 118
+    poke b
+    push constant 153
+    push constant 119
+    poke b
+    push constant 208
+    push constant 120
+    poke b
+    push constant 80
+    push constant 121
+    poke b
+    push constant 58
+    push constant 122
+    poke b
+    push constant 178
+    push constant 123
+    poke b
+    push constant 174
+    push constant 124
+    poke b
+    push constant 218
+    push constant 125
+    poke b
+    push constant 198
+    push constant 126
+    poke b
+    push constant 196
+    push constant 127
+    poke b
+    push constant 243
+    push constant 128
+    poke b
+    push constant 161
+    push constant 129
+    poke b
+    push constant 166
+    push constant 130
+    poke b
+    push constant 162
+    push constant 131
+    poke b
+    push constant 27
+    push constant 132
+    poke b
+    push constant 129
+    push constant 133
+    poke b
+    push constant 101
+    push constant 134
+    poke b
+    push constant 126
+    push constant 135
+    poke b
+    push constant 216
+    push constant 136
+    poke b
+    push constant 105
+    push constant 137
+    poke b
+    push constant 59
+    push constant 138
+    poke b
+    push constant 104
+    push constant 139
+    poke b
+    push constant 58
+    push constant 140
+    poke b
+    push constant 29
+    push constant 141
+    poke b
+    push constant 103
+    push constant 142
+    poke b
+    push constant 249
+    push constant 143
+    poke b
+    push constant 47
+    push constant 144
+    poke b
+    push constant 249
+    push constant 145
+    poke b
+    push constant 247
+    push constant 146
+    poke b
+    push constant 224
+    push constant 147
+    poke b
+    push constant 152
+    push constant 148
+    poke b
+    push constant 238
+    push constant 149
+    poke b
+    push constant 242
+    push constant 150
+    poke b
+    push constant 245
+    push constant 151
+    poke b
+    push constant 145
+    push constant 152
+    poke b
+    push constant 89
+    push constant 153
+    poke b
+    push constant 249
+    push constant 154
+    poke b
+    push constant 108
+    push constant 155
+    poke b
+    push constant 169
+    push constant 156
+    poke b
+    push constant 64
+    push constant 157
+    poke b
+    push constant 125
+    push constant 158
+    poke b
+    push constant 118
+    push constant 159
+    poke b
+    push constant 175
+    push constant 160
+    poke b
+    push constant 73
+    push constant 161
+    poke b
+    push constant 65
+    push constant 162
+    poke b
+    push constant 164
+    push constant 163
+    poke b
+
+    return
+
+function compare_bytes 3
+    push argument 0
+    pop local 0
+    push argument 1
+    pop local 1
+    push constant 0
+    pop local 2
+
+    label C1
+        push local 2
+        push constant 48
+        eq
+        if-goto true
+        goto C2
+    label C2
+        push local 2
+        push constant 2
+        add
+        pop local 2
+
+        push local 0
+        peek w
+        push local 1
+        peek w
+
+        push local 0
+        push constant 2
+        add
+        pop local 0
+
+        push local 1
+        push constant 2
+        add
+        pop local 1
+
+        eq
+        if-goto C1
+        goto false
+
+    label false
+        return
+    label true
+        push constant 65
+        push constant 0
+        poke b
+        push constant 99
+        push constant 1
+        poke b
+        push constant 99
+        push constant 2
+        poke b
+        push constant 101
+        push constant 3
+        poke b
+        push constant 115
+        push constant 4
+        poke b
+        push constant 115
+        push constant 5
+        poke b
+        push constant 32
+        push constant 6
+        poke b
+        push constant 103
+        push constant 7
+        poke b
+        push constant 114
+        push constant 8
+        poke b
+        push constant 97
+        push constant 9
+        poke b
+        push constant 110
+        push constant 10
+        poke b
+        push constant 116
+        push constant 11
+        poke b
+        push constant 101
+        push constant 12
+        poke b
+        push constant 100
+        push constant 13
+        poke b
+        push constant 10
+        push constant 14
+        poke b
+
+        push constant 0
+        push constant 15
+        print c
+
+        return

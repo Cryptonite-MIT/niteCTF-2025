@@ -1,0 +1,58 @@
+
+interface Node {
+  id: ID!
+}
+
+type Product implements Node {
+  id: ID!
+  name: String
+  specs: String
+}
+
+type User implements Node {
+  id: ID!
+  username: String!
+  fullName: String
+  role: String
+}
+
+type Profile implements Node {
+  id: ID!
+  userId: ID!
+  bio: String
+  avatarUrl: String
+}
+
+type Order implements Node {
+  id: ID!
+  userId: ID!
+  productId: ID!
+  status: String
+  createdAt: String
+}
+
+type AuditLog implements Node {
+  id: ID!
+  action: String!
+  actorId: ID!
+  targetNodeId: ID!
+  timestamp: String!
+  details: String
+}
+
+type secret implements Node {
+  id: ID!
+  hint: String
+  flag: String
+  level: String
+}
+
+type Query {
+  about: String
+  products: [Product]
+  users: [User]
+  profiles: [Profile]
+  orders: [Order]
+  auditLogs: [AuditLog]
+  node(id: ID!): Node
+}

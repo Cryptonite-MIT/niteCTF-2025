@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Profile - nite SSO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            background: #3c8dbc;
+            color: white;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .user-menu {
+            color: white;
+        }
+
+        .user-menu a {
+            color: white;
+            text-decoration: none;
+            margin-left: 15px;
+        }
+
+        .container {
+            display: flex;
+            height: calc(100vh - 60px);
+        }
+
+        .sidebar {
+            width: 230px;
+            background: #222d32;
+            color: #b8c7ce;
+            padding-top: 20px;
+        }
+
+        .sidebar-header {
+            color: #4b646f;
+            padding: 10px 15px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li {
+            border-left: 3px solid transparent;
+        }
+
+        .sidebar-menu li:hover {
+            background: #1e282c;
+            border-left-color: #3c8dbc;
+        }
+
+        .sidebar-menu a {
+            color: #b8c7ce;
+            text-decoration: none;
+            display: block;
+            padding: 12px 15px;
+        }
+
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            display: inline-block;
+        }
+
+        .content {
+            flex: 1;
+            padding: 30px;
+        }
+
+        .content-box {
+            background: white;
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #3c8dbc;
+            margin-top: 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3c8dbc;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="header">
+        <div class="logo"><b>nite</b> SSO</div>
+        <div class="user-menu">
+            <span>{{ user.username }}</span>
+            <a href="/logout">Logout</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <aside class="sidebar">
+            <div class="sidebar-header">Navigation</div>
+            <ul class="sidebar-menu">
+                <li><a href="/"><i>🏠</i> Home</a></li>
+                <li><a href="/profile"><i>👤</i> Profile</a></li>
+                <li><a href="/settings"><i>⚙️</i> Settings</a></li>
+                <li><a href="/sessions"><i>📋</i> Sessions</a></li>
+            </ul>
+
+            <div class="sidebar-header" style="margin-top: 20px;">nite Services</div>
+            <ul class="sidebar-menu">
+                <li><a href="{{ PORTAL_URL }}" target="_blank"><i>📄</i> Document Portal</a></li>
+            </ul>
+        </aside>
+
+        <div class="content">
+            <div class="content-box">
+                <h1>User Profile</h1>
+
+                <p><strong>Username:</strong> {{ user.username }}</p>
+                <p><strong>User ID:</strong> {{ user.id }}</p>
+
+                <h2>Active Sessions</h2>
+                <table>
+                    <tr>
+                        <th>Session ID</th>
+                        <th>Created</th>
+                    </tr>
+                    {% for sess in sessions %}
+                    <tr>
+                        <td>{{ sess.session_id[:30] }}...</td>
+                        <td>{{ sess.created_at }}</td>
+                    </tr>
+                    {% endfor %}
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

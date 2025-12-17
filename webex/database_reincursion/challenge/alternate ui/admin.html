@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Citadel Admin Panel</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    /* Professional autofill styling */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:focus {
+      -webkit-box-shadow: 0 0 0px 1000px #f8f9fa inset !important;
+      -webkit-text-fill-color: #495057 !important;
+      font-family: ui-sans-serif, system-ui, sans-serif !important;
+      caret-color: #495057;
+    }
+    select, option {
+      background-color: #f8f9fa;
+      color: #495057;
+      font-family: ui-sans-serif, system-ui, sans-serif;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 text-gray-800 p-6 font-sans">
+  <div class="max-w-7xl mx-auto">
+    <div class="flex justify-between items-center mb-8 pb-4 border-b border-gray-200">
+      <h1 class="text-3xl font-bold text-gray-800">
+        Administration Panel
+      </h1>
+    </div>
+
+    <!-- System Status Panel -->
+    <div class="mb-8 bg-red-50 border border-red-200 rounded-lg p-4">
+      <div class="font-semibold text-red-800 mb-2">System Security Status</div>
+      <div class="text-sm text-red-700 space-y-1">
+        <div>Firewall Integrity: <span class="font-medium">Critical (0%)</span></div>
+        <div>Filter Engine: <span class="font-medium">Compromised — 12% Active</span></div>
+        <div>Audit Logging: <span class="font-medium">Disabled</span></div>
+        <div>Threat Response: <span class="font-medium">Unavailable</span></div>
+      </div>
+    </div>
+
+    <!-- Report Query Form -->
+    <form id="report-form" method="post" action="/admin"
+          class="bg-white border border-gray-300 rounded-lg p-6 mb-8 shadow-sm">
+      <label class="block text-gray-700 mb-3 font-medium">Generate Report</label>
+      <div class="flex space-x-3">
+        <input type="text" name="query" placeholder="e.g., Q1"
+               class="flex-1 p-3 rounded-md border border-gray-300 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200">
+        <button type="submit"
+                class="px-6 py-3 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 transition duration-200">
+          Run Query
+        </button>
+      </div>
+    </form>
+
+    {% if message %}
+      <div class="mb-6 p-3 rounded-md border border-red-300 bg-red-50 text-red-700 text-center font-medium">
+        {{ message }}
+      </div>
+    {% endif %}
+
+    <!-- Reports Section -->
+    <div class="mb-10">
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Financial Reports</h2>
+      <div class="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">ID</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quarter</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Note</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Revenue</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              {% for row in results %}
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row[0] }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{{ row[1] }}</td>
+                <td class="px-6 py-4 text-sm text-gray-500">{{ row[2] }}</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 font-medium">{{ row[3] }}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Metadata Registry Section -->
+    <div>
+      <h2 class="text-2xl font-semibold mb-4 text-gray-800">Database Schema</h2>
+      <p class="mb-4 text-gray-600">This registry lists available tables in the system database.</p>
+      <div class="bg-white border border-gray-300 rounded-lg shadow-sm overflow-hidden">
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead class="bg-gray-50">
+              <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Table Name</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Updated</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200">
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">reports</td>
+                <td class="px-6 py-4 text-sm text-gray-500">Quarterly revenue data for executives</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2077-02-14</td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">users</td>
+                <td class="px-6 py-4 text-sm text-gray-500">Stores user information</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2077-06-09</td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">employees</td>
+                <td class="px-6 py-4 text-sm text-gray-500">Directory of employees and their notes</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2077-09-23</td>
+              </tr>
+              <tr class="hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-mono text-gray-900">metadata</td>
+                <td class="px-6 py-4 text-sm text-gray-500">Lists tables in this system</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">2077-12-05</td>
+              </tr>
+              <tr class="bg-gray-100 hover:bg-gray-50 transition duration-150">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 italic">[CLASSIFIED]</td>
+                <td class="px-6 py-4 text-sm text-gray-400 italic">[CLASSIFIED]</td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-400 italic">[CLASSIFIED]</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

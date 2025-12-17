@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Citadel Corp Portal - Login</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    html { color-scheme: light; }
+    input, button { font-family: inherit; }
+
+    /* Professional autofill styling */
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover,
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px #f8f9fa inset !important;
+      -webkit-text-fill-color: #495057 !important;
+      caret-color: #495057 !important;
+      border: 1px solid #ced4da !important;
+      border-radius: 0.375rem !important;
+      font-family: inherit !important;
+      font-size: inherit !important;
+      line-height: inherit !important;
+      transition: background-color 99999s ease-in-out 0s, color 99999s ease-in-out 0s;
+      background-clip: padding-box !important;
+    }
+    input:-webkit-autofill:focus {
+      -webkit-text-fill-color: #212529 !important;
+      caret-color: #0066cc !important;
+      border-color: #0066cc !important;
+      -webkit-box-shadow: 0 0 0 1000px #f8f9fa inset, 0 0 0 2px rgba(0, 102, 204, 0.25) !important;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-50 flex items-center justify-center font-sans">
+  <div class="bg-white border border-gray-300 rounded-lg shadow-lg w-full max-w-md p-8">
+    <div class="text-center mb-8">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">
+        Citadel Corp
+      </h1>
+      <h2 class="text-lg text-gray-600">
+        Employee Portal
+      </h2>
+    </div>
+
+    {% if error %}
+    <div class="mb-4 p-3 rounded border border-red-300 bg-red-50 text-red-700 text-center text-sm">
+      {{ error }}
+    </div>
+    {% endif %}
+
+    <!-- Main login form -->
+    <form id="login-form" method="post" action="/" class="space-y-6">
+      <div>
+        <label class="block text-gray-700 mb-2 font-medium">Username</label>
+        <input name="username" placeholder="Enter your username"
+          class="w-full p-3 rounded-md border border-gray-300 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200" />
+      </div>
+      <div>
+        <label class="block text-gray-700 mb-2 font-medium">Password</label>
+        <input type="password" name="password" placeholder="Enter your password"
+          class="w-full p-3 rounded-md border border-gray-300 text-gray-700 placeholder-gray-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition duration-200"/>
+      </div>
+      <button type="submit"
+        class="w-full py-3 rounded-md bg-blue-600 text-white font-medium hover:bg-blue-700 transition duration-200 shadow-sm"
+        id="login-button">
+        Sign In
+      </button>
+    </form>
+  </div>
+
+<script>
+document.addEventListener("DOMContentLoaded", () => {
+  const form = document.getElementById("login-form");
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    
+    console.log("Login form submitted"); // Debug
+    
+    // Clear any existing error
+    const existingError = document.querySelector('.error-message');
+    if (existingError) {
+      existingError.remove();
+    }
+    
+    const formData = new FormData(form);
+    
+    try {
+      const res = await fetch(form.action, {
+        method: "POST",
+        body: formData,
+        headers: { "Accept": "application/json" }
+      });
+
+      
+      const responseText = await res.text();
+
+      let json;
+      try {
+        json = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error("Failed to parse JSON:", parseError);
+        showError("Login failed - invalid response");
+        return;
+      }
+      
+      if (res.ok && (json.success || json.access_token)) {
+        window.location.href = json.redirect || "/search";
+      } else {
+        showError(json.msg || "Login failed");
+      }
+    } catch (error) {
+      showError("Login failed - network error");
+    }
+  });
+  
+  function showError(message) {
+    const errorDiv = document.createElement('div');
+    errorDiv.className = 'error-message mb-4 p-3 rounded border border-red-300 bg-red-50 text-red-700 text-center text-sm';
+    errorDiv.textContent = message;
+    
+    const form = document.getElementById('login-form');
+    form.parentNode.insertBefore(errorDiv, form);
+    
+    setTimeout(() => {
+      if (errorDiv.parentNode) {
+        errorDiv.remove();
+      }
+    }, 5000);
+  }
+});
+</script>
+
+</body>
+</html>

@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Sessions - nite SSO</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #ecf0f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #3c8dbc;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            padding: 10px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #3c8dbc;
+            color: white;
+        }
+
+        .revoke-btn {
+            background: #e74c3c;
+            color: white;
+            border: none;
+            padding: 5px 10px;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+
+        .nav {
+            margin-bottom: 20px;
+        }
+
+        .nav a {
+            margin-right: 15px;
+            color: #3c8dbc;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="nav">
+            <a href="/">Home</a>
+            <a href="/profile">Profile</a>
+            <a href="/settings">Settings</a>
+            <a href="/sessions">Sessions</a>
+            <a href="/logout">Logout</a>
+        </div>
+
+        <h1>Active Sessions</h1>
+        <p>Manage your active login sessions across devices.</p>
+
+        <table>
+            <tr>
+                <th>Session ID</th>
+                <th>Created</th>
+                <th>Action</th>
+            </tr>
+            {% for sess in sessions %}
+            <tr>
+                <td>{{ sess.session_id[:30] }}...</td>
+                <td>{{ sess.created_at }}</td>
+                <td>
+                    <form method="POST" action="/sessions/revoke/{{ sess.session_id }}" style="display: inline;">
+                        <button type="submit" class="revoke-btn">Revoke</button>
+                    </form>
+                </td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+
+</html>
